@@ -1,13 +1,5 @@
 #!/usr/bin/env sh
 
-# This script sets
-
-# Infer the UID/GID of docker volumes
-# Asign the UID/GID to $USER
-# Assign ownership of the $WORKDIR to UID/GID
-# Switch to $USER
-# Invoke the real entrypoint
-
 # Flags:
 #  -t=. #$TEMPLATE directory to infer UID/GID from
 #  -U=docker # $USER to assign the UID/GID
@@ -66,6 +58,9 @@ fi
 
 OLD_UID="$(id -u $USER)"
 OLD_GID="$(id -g $USER)"
+
+# Change owner of files belonging to the old UID
+find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \;
 
 # $ANY is a shorthand regex
 # It should capture any field in /etc/passwd or /etc/group
