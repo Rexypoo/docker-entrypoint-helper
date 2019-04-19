@@ -45,7 +45,7 @@ fi
 #--------------------------------------
 
 # Create $USER if it doesn't exist
-grep --silent "$USER" /etc/passwd
+grep -q "$USER" /etc/passwd
 if [ "$?" -ne "0" ]; then
   >&2 echo "Didn't find user '$USER' in /etc/passwd"
   >&2 echo "Creating user '$USER'"
