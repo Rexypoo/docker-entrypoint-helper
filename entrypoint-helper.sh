@@ -76,11 +76,6 @@ OLD_GROUP="^$ANY:$ANY:$OLD_GID:"
 NEW_GROUP="\1:\2:$NEW_GID:"
 sed -i "s|$OLD_GROUP|$NEW_GROUP|" /etc/group
 
-# Assign the workdir to the UID/GID
-#--------------------------------------
-
-chown --recursive "$NEW_UID":"$NEW_GID" "$WORKDIR"
-
 # Drop root privileges and invoke the entrypoint
 #--------------------------------------
 su - "$USER" -c "$@"
