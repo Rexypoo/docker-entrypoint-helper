@@ -45,10 +45,10 @@ fi
 #--------------------------------------
 
 # Create $USER if it doesn't exist
-if [ "grep -q \"$USER\" /etc/passwd" ]; then
+if [ ! "grep -q \"$USER\" /etc/passwd" ]; then
   >&2 echo "Didn't find user '$USER' in /etc/passwd"
   >&2 echo "Creating user '$USER'"
-  # Get a random UID/GID from 10,000 to 32,767
+  # Get a random UID/GID from 10,000 to 65,532
   while [ "${ID:-0}" -lt "10000" ] || [ "${ID:-99999}" -ge "65533" ]; do
     ID=$(od -An -tu -N2 /dev/urandom)
   done
