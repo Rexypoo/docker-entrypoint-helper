@@ -71,8 +71,10 @@ if [ "$OLD_UID" -lt "10000" ] || [ "$OLD_GID" -lt "10000" ]; then
   >&2 echo "  Do not assign UID/GID 65533 or 65534, they may exist."
   >&2 echo "This script will NOT modify permissions for safety."
 else
-  echo "Modifying ownership of files belonging to ${USER}."
-  find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \; 2>/dev/null
+  if [ "$OLD_UID" -ne "$NEW_UID" ] && [ "$OLD_GID" -ne "$NEW_GID" ]; then
+    echo "Modifying ownership of files belonging to ${USER}."
+    find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \; 2>/dev/null
+  fi
 fi
 
 # $ANY is a shorthand regex
