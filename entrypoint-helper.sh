@@ -50,7 +50,7 @@ if [ ! "grep -q \"$USER\" /etc/passwd" ]; then
   >&2 echo "Creating user '$USER'"
   # Get a random UID/GID from 10,000 to 65,532
   while [ "${ID:-0}" -lt "10000" ] || [ "${ID:-99999}" -ge "65533" ]; do
-    ID=$(od -An -tu -N2 /dev/urandom)
+    ID=$(od -An -tu -N2 /dev/urandom | tr -d " ")
   done
   adduser \
     --disabled-password \
@@ -72,7 +72,7 @@ if [ "$OLD_UID" -lt "10000" ] || [ "$OLD_GID" -lt "10000" ]; then
   >&2 echo "This script will NOT modify permissions for safety."
 else
   echo "Modifying ownership of files belonging to ${USER}."
-  find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \;
+  find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \; 2>/dev/null
 fi
 
 # $ANY is a shorthand regex
