@@ -45,14 +45,18 @@ fi
 #--------------------------------------
 
 # Create $USER if it doesn't exist
-grep -q "$USER" /etc/passwd
-if [ "$?" -ne "0" ]; then
+if [ "grep -q \"$USER\" /etc/passwd" ]; then
   >&2 echo "Didn't find user '$USER' in /etc/passwd"
   >&2 echo "Creating user '$USER'"
+  # Get a random UID/GID from 10,000 to 32,767
+  while [ "${ID:-0}" -lt "10000" ] || [ "${ID:-99999}" -ge "65533" ]; do
+    ID=$(od -An -tu -N2 /dev/urandom)
+  done
   adduser \
     --disabled-password \
-    --no-create-home \
     --gecos "" \
+    --no-create-home \
+    --uid "$ID" \
     "$USER" >/dev/null
 fi
 
@@ -60,7 +64,16 @@ OLD_UID="$(id -u $USER)"
 OLD_GID="$(id -g $USER)"
 
 # Change owner of files belonging to the old UID
-find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \;
+if [ "$OLD_UID" -lt "10000" ] || [ "$OLD_GID" -lt "10000" ]; then
+  >&2 echo "Warning: the container default UID or GID may be unsafe."
+  >&2 echo "  UID: $OLD_UID, GID: $OLD_GID"
+  >&2 echo "Please assign $USER a UID/GID above 10000."
+  >&2 echo "  Do not assign UID/GID 65533 or 65534, they may exist."
+  >&2 echo "This script will NOT modify permissions for safety."
+else
+  echo "Modifying ownership of files belonging to ${USER}."
+  find / -user "$USER" -exec chown "$NEW_UID":"$NEW_GID" {} \;
+fi
 
 # $ANY is a shorthand regex
 # It should capture any field in /etc/passwd or /etc/group
