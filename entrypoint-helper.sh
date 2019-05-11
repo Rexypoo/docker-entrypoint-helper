@@ -91,6 +91,15 @@ OLD_GROUP="^$ANY:$ANY:$OLD_GID:"
 NEW_GROUP="\1:\2:$NEW_GID:"
 sed -i "s|$OLD_GROUP|$NEW_GROUP|" /etc/group
 
+# su behaves inconsistently with -c followed by flags
+# Workaround: run the entrypoint and commands as a standalone script
+echo "#!/usr/bin/env sh" >> /usr/local/bin/invocation.sh
+echo >> /usr/local/bin/invocation.sh
+for ARG in "$@"; do
+    printf "\"${ARG}\" " >> /usr/local/bin/invocation.sh
+done
+chmod a+x /usr/local/bin/invocation.sh
+
 # Drop root privileges and invoke the entrypoint
 #--------------------------------------
-su - "$USER" -c "$@"
+su - "$USER" -c "/usr/local/bin/invocation.sh"
