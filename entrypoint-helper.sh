@@ -93,4 +93,4 @@ sed -i "s|$OLD_GROUP|$NEW_GROUP|" /etc/group
 
 # Drop root privileges and invoke the entrypoint
 #--------------------------------------
-su - "$USER" -- "$@"
+su - "$USER" -c "$@"
