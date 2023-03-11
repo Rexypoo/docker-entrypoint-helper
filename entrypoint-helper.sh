@@ -28,8 +28,8 @@ WORKDIR="${WORKDIR:-$(pwd)}"
 # Infer the UID/GID
 #--------------------------------------
 
-NEW_UID=$(stat -c "%u" "$TEMPLATE")
-NEW_GID=$(stat -c "%g" "$TEMPLATE")
+NEW_UID=${NEW_UID:-$(stat -c "%u" "$TEMPLATE")}
+NEW_GID=${NEW_GID:-$(stat -c "%g" "$TEMPLATE")}
 
 if [ "$NEW_UID" -eq "0" ] || [ "$NEW_GID" -eq "0" ] ; then
   >&2 echo "ERROR!!!"
@@ -99,6 +99,11 @@ for ARG in "$@"; do
     printf "\"${ARG}\" " >> /usr/local/bin/invocation.sh
 done
 chmod a+x /usr/local/bin/invocation.sh
+
+# The docker file permissions on OSX seem to be hopelessly broken
+# Workaround:
+#  Add directories the user should own to /tmp/entrypoint-helper/chown/
+chown -R "$NEW_UID":"$NEW_GID" /tmp/entrypoint-helper/chown
 
 # Drop root privileges and invoke the entrypoint
 #--------------------------------------
