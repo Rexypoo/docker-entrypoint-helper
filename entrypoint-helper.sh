@@ -103,7 +103,9 @@ chmod a+x /usr/local/bin/invocation.sh
 # The docker file permissions on OSX seem to be hopelessly broken
 # Workaround:
 #  Add directories the user should own to /tmp/entrypoint-helper/chown/
-chown -R "$NEW_UID":"$NEW_GID" /tmp/entrypoint-helper/chown
+if [ -d "/tmp/entrypoint-helper/chown" ]; then
+    chown -R "$NEW_UID":"$NEW_GID" /tmp/entrypoint-helper/chown
+fi
 
 # Drop root privileges and invoke the entrypoint
 #--------------------------------------
